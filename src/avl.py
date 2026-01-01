@@ -70,54 +70,72 @@ class AVLTree(BinaryTree):
 
     return node
 
-  # min, max e search permanecem iguais aos da BST
     if node == ROOT:
       node = self.root
     while node.left:
       node = node.left
     return node.data
 
-  def remove(self, value, node=ROOT):
-    if node == ROOT:
-      node = self.root
-    if node is None:
-      return node
+  def min_node(self, node):
+          current = node
+          while current.left is not None:
+              current = current.left
+          return current
 
-    if value < node.data: 
-      node.left = self.remove(value, node.left)
-    elif value > node.data: 
-      node.right = self.remove(value, node.right)
-    else: 
-      if node.left is None:
-        return node.right
-      elif node.right is None:
-        return node.left
+  def remove(self, value):
+      # Chama a função recursiva e ATUALIZA a raiz da árvore
+      if self.root:
+          self.root = self._remove(self.root, value)
+
+  def _remove(self, node, value):
+      if not node:
+          return node
+
+      if value < node.data:
+          node.left = self._remove(node.left, value)
+      elif value > node.data:
+          node.right = self._remove(node.right, value)
       else:
-        substitute = self.min(node.right) 
-        node.data = substitute
-        node.right = self.remove(substitute, node.right)
-    
-    if node is None:
+          
+          # Caso 1 ou 2: Nó com um filho ou nenhum
+          if node.left is None:
+              temp = node.right
+              node = None
+              return temp
+          elif node.right is None:
+              temp = node.left
+              node = None
+              return temp
+
+          # Caso 3: Nó com dois filhos
+          # Pega o menor nó da subárvore direita (sucessor in-order)
+          temp = self.min_node(node.right)
+          # Copia o dado do sucessor para este nó
+          node.data = temp.data
+          node.right = self._remove(node.right, temp.data)
+
+      if node is None:
+          return node
+      node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
+
+      balance = self.get_balance(node)
+
+      # Esquerda Pesada (Left Left)
+      if balance > 1 and self.get_balance(node.left) >= 0:
+          return self.right_rotate(node)
+
+      # Esquerda Direita (Left Right)
+      if balance > 1 and self.get_balance(node.left) < 0:
+          node.left = self.left_rotate(node.left)
+          return self.right_rotate(node)
+
+      # Direita Pesada (Right Right)
+      if balance < -1 and self.get_balance(node.right) <= 0:
+          return self.left_rotate(node)
+
+      # Direita Esquerda (Right Left)
+      if balance < -1 and self.get_balance(node.right) > 0:
+          node.right = self.right_rotate(node.right)
+          return self.left_rotate(node)
+
       return node
-
-    # Autobalanceamento após remoção
-
-    node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
-
-    balance = self.get_balance(node)
-
-    if balance > 1 and self.get_balance(node.left) >= 0:
-      return self.right_rotate(node)
-
-    if balance > 1 and self.get_balance(node.left) < 0:
-      node.left = self.left_rotate(node.left)
-      return self.right_rotate(node)
-
-    if balance < -1 and self.get_balance(node.right) <= 0:
-      return self.left_rotate(node)
-
-    if balance < -1 and self.get_balance(node.right) > 0:
-      node.right = self.right_rotate(node.right)
-      return self.left_rotate(node)
-
-    return node
