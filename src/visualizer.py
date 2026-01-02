@@ -1,5 +1,5 @@
 import graphviz
-
+ROOT = "root"
 class TreeVisualizer:
     def visualize_binary_tree(self, tree):
         dot = graphviz.Digraph()
@@ -120,34 +120,41 @@ class TreeVisualizer:
         traverse(trie.root, root_id)
         return dot
 
-    def visualize_patricia(self, tree):
-        dot = graphviz.Digraph()
+    def visualize_patricia(self, trie, output_name="patricia_trie"):
+            dot = graphviz.Digraph()
+            dot.attr(rankdir='TB')
 
-        if not tree.root:
+            # Agora 'trie' é realmente o objeto PatriciaTrie, pois 'self' absorveu o visualizador
+            root_id = str(id(trie.root)) 
+            dot.node(root_id, "root", shape='plaintext')
+
+            def add_nodes_recursive(node, parent_id):
+                for char, child_node in sorted(node.children.items()):
+                    child_id = str(id(child_node))
+                    
+                    # Definição visual
+                    if child_node.is_leaf:
+                        shape = 'doublecircle'
+                        color = 'green'
+                        style = 'filled'
+                        fillcolor = '#eaffea'
+                    else:
+                        shape = 'circle'
+                        color = 'black'
+                        style = ''
+                        fillcolor = ''
+
+                    dot.node(child_id, "", shape=shape, color=color, style=style, fillcolor=fillcolor)
+                    
+                    # Label da aresta = prefixo completo
+                    edge_label = child_node.label
+                    dot.edge(parent_id, child_id, label=edge_label)
+
+                    add_nodes_recursive(child_node, child_id)
+
+            # Inicia a recursão
+            add_nodes_recursive(trie.root, root_id)    
             return dot
-
-        def traverse(node):
-            node_id = str(id(node))
-
-            if node.is_leaf:
-                label = f"Key: {node.key}"
-                dot.node(node_id, label, shape='box', style='filled', fillcolor='#fff9c4')
-            else:
-                label = f"Bit: {node.bit_index}"
-                dot.node(node_id, label, shape='ellipse')
-
-                if node.left:
-                    l_id = str(id(node.left))
-                    dot.edge(node_id, l_id, label='0', style='dashed')
-                    traverse(node.left)
-
-                if node.right:
-                    r_id = str(id(node.right))
-                    dot.edge(node_id, r_id, label='1')
-                    traverse(node.right)
-
-        traverse(tree.root)
-        return dot
 
     def visualize_hashtable(self, hashtable):
         dot = graphviz.Digraph()

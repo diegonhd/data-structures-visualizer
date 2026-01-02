@@ -36,10 +36,10 @@ class Trie:
             node = node.children[char]
         return True
 
-    def delete(self, word):
-        self._delete(self.root, word, 0)
+    def remove(self, word):
+        self._remove(self.root, word, 0)
 
-    def _delete(self, node, word, index):
+    def _remove(self, node, word, index):
         # Caso base: chegamos ao fim da palavra
         if index == len(word):
             if not node.is_end_of_word:
@@ -54,9 +54,9 @@ class Trie:
             return False
 
         child_node = node.children[char]
-        should_delete_child = self._delete(child_node, word, index + 1)
+        should_remove_child = self._remove(child_node, word, index + 1)
 
-        if should_delete_child:
+        if should_remove_child:
             del node.children[char]
             return len(node.children) == 0 and not node.is_end_of_word
         
@@ -74,174 +74,135 @@ class Trie:
         for char, child_node in sorted(node.children.items()):
             self._print_recursive(child_node, current_word + char)
 
-class PatriciaNode:
-    def __init__(self, key=None, bit_index=None, is_leaf=False):
-        self.key = key             # Usado apenas se is_leaf=True
-        self.bit_index = bit_index # Usado apenas se is_leaf=False
-        self.is_leaf = is_leaf
-        self.left = None
-        self.right = None
 
-    def __repr__(self):
-        if self.is_leaf:
-            return f"[Leaf: {self.key}]"
-        return f"[Node: bit {self.bit_index}]"
+class PatriciaNode:
+    def __init__(self, label, is_leaf=False):
+        self.label = label
+        self.children = {}
+        self.is_leaf = is_leaf
 
 class PatriciaTrie:
     def __init__(self):
-        self.root = None
+        self.root = PatriciaNode("") # Raiz vazia
 
-    def _get_bit(self, key, index):
-        """Retorna o i-ésimo bit da string (0 ou 1)."""
-        if index < 0: return 0
-        char_index = index // 8
-        
-        # Se o índice excede o tamanho da string, consideramos bits virtuais 0
-        if char_index >= len(key): return 0
-        
-        # Pega o char e desloca para encontrar o bit
-        byte_val = ord(key[char_index])
-        bit_offset = 7 - (index % 8)
-        return (byte_val >> bit_offset) & 1
-
-    def _first_bit_diff(self, key1, key2):
-        """
-        Encontra o índice do primeiro bit diferente entre duas chaves.
-        Auxiliar essencial para a Inserção.
-        """
-        len1, len2 = len(key1), len(key2)
-        max_len = max(len1, len2)
-        
-        # Itera byte a byte (caractere a caractere)
-        for i in range(max_len):
-            # Obtém valor ASCII ou 0 se acabou a string
-            b1 = ord(key1[i]) if i < len1 else 0
-            b2 = ord(key2[i]) if i < len2 else 0
-            
-            if b1 != b2:
-                # Se os bytes são diferentes, achamos qual bit difere
-                xor_val = b1 ^ b2
-                # Varre do bit mais significativo (7) ao menos (0)
-                for bit in range(7, -1, -1):
-                    if (xor_val >> bit) & 1:
-                        return (i * 8) + (7 - bit)
-        return -1 # Chaves iguais
-
-    def search(self, key):
-        """
-        Busca uma chave na árvore.
-        Retorna True se encontrada, False caso contrário.
-        """
-        if self.root is None:
-            return False
-        
-        curr = self.root
-        
-        # 1. Navegação cega: Segue os bits indicados pelos nós internos
-        while not curr.is_leaf:
-            bit = self._get_bit(key, curr.bit_index)
-            if bit == 0:
-                curr = curr.left
-            else:
-                curr = curr.right
-        
-        # 2. Verificação final: Compara a chave da folha encontrada com a buscada
-        return curr.key == key
+    def _get_common_prefix(self, s1, s2):
+        """Retorna o prefixo comum entre duas strings."""
+        min_len = min(len(s1), len(s2))
+        for i in range(min_len):
+            if s1[i] != s2[i]:
+                return s1[:i]
+        return s1[:min_len]
 
     def insert(self, key):
-        """
-        Insere uma nova chave na árvore Patricia.
-        """
-        # Caso 1: Árvore vazia
-        if self.root is None:
-            self.root = PatriciaNode(key=key, is_leaf=True)
-            return
-
-        # Caso 2: Árvore não vazia.
-        curr = self.root
-        while not curr.is_leaf:
-            bit = self._get_bit(key, curr.bit_index)
-            if bit == 0:
-                curr = curr.left
-            else:
-                curr = curr.right
+        node = self.root
+        i = 0 
         
-        existing_key = curr.key
-        
-        if existing_key == key:
-            print(f"Chave '{key}' já existe.")
-            return
-
-        diff_index = self._first_bit_diff(key, existing_key)
-
-        parent = None
-        curr = self.root
-        
-        while not curr.is_leaf and curr.bit_index < diff_index:
-            parent = curr
-            bit = self._get_bit(key, curr.bit_index)
-            if bit == 0:
-                curr = curr.left
-            else:
-                curr = curr.right
-        
-        # Cria o novo nó interno e a nova folha
-        new_leaf = PatriciaNode(key=key, is_leaf=True)
-        new_internal = PatriciaNode(bit_index=diff_index, is_leaf=False)
-        
-        # Decide quem vai para a esquerda ou direita no novo nó interno
-        bit_val = self._get_bit(key, diff_index)
-        
-        if bit_val == 0:
-            new_internal.left = new_leaf
-            new_internal.right = curr # O nó antigo (subárvore ou folha)
-        else:
-            new_internal.left = curr
-            new_internal.right = new_leaf
+        while i < len(key):
+            char = key[i]
             
-        # Conecta o novo nó interno ao pai
-        if parent is None:
-            self.root = new_internal
-        else:
-            if parent.left == curr:
-                parent.left = new_internal
+            if char in node.children:
+                child = node.children[char]
+                common_prefix = self._get_common_prefix(child.label, key[i:])
+                common_len = len(common_prefix)
+                
+                # Caso 1: Split do nó existente
+                if common_len < len(child.label):
+                    suffix_existing = child.label[common_len:]
+                    suffix_new = key[i + common_len:]
+                    
+                    child.label = common_prefix
+                    
+                    new_child_existing = PatriciaNode(suffix_existing, child.is_leaf)
+                    new_child_existing.children = child.children
+                    
+                    child.children = {suffix_existing[0]: new_child_existing} if suffix_existing else {}
+                    child.is_leaf = False 
+                    
+                    if suffix_new:
+                        new_child_new = PatriciaNode(suffix_new, True)
+                        child.children[suffix_new[0]] = new_child_new
+                    else:
+                        child.is_leaf = True
+                    return
+                
+                # Caso 2: Descendo na árvore
+                i += common_len
+                node = child
             else:
-                parent.right = new_internal
+                # Caso 3: Novo ramo
+                new_node = PatriciaNode(key[i:], True)
+                node.children[key[i]] = new_node
+                return
         
-        print(f"Inserido: '{key}' (Divisão no bit {diff_index})")
-
+        node.is_leaf = True
     def remove(self, key):
-        """
-        Remove uma chave (código original mantido para integridade).
-        """
-        if self.root is None: return
+            """Remove uma chave da árvore, se existir."""
+            self._remove_node(self.root, key)
 
-        if self.root.is_leaf:
-            if self.root.key == key:
-                self.root = None
-            return
+    def _remove_node(self, parent, key):
+        if not key or not parent.children:
+            return False
 
-        grandparent = None
-        parent = None
-        curr = self.root
+        char = key[0]
+        if char not in parent.children:
+            return False
 
-        while not curr.is_leaf:
-            grandparent = parent
-            parent = curr
-            bit = self._get_bit(key, curr.bit_index)
-            if bit == 0: curr = curr.left
-            else: curr = curr.right
+        child = parent.children[char]
+        label = child.label
 
-        if curr.key != key:
-            print(f"Erro ao remover: Chave '{key}' não encontrada.")
-            return
+        # Verifica se o label do nó atual é prefixo da chave que buscamos
+        if not key.startswith(label):
+            return False # Caminho não bate
 
-        sibling = parent.right if parent.left == curr else parent.left
+        # Caso 1: Encontramos o nó exato
+        if len(key) == len(label):
+            if not child.is_leaf:
+                return False # A palavra não existe (é apenas prefixo de outra)
 
-        if grandparent is None:
-            self.root = sibling
-        else:
-            if grandparent.left == parent: grandparent.left = sibling
-            else: grandparent.right = sibling
+            # Desmarca como folha (lógica de "soft delete")
+            child.is_leaf = False
+
+            # Agora verificamos a estrutura para limpeza (Hard delete ou Merge)
             
-        print(f"Removido: '{key}'")
+            # A) Se não tem filhos, remove o nó do pai
+            if not child.children:
+                del parent.children[char]
+            
+            # B) Se tem exatamente 1 filho, faz o merge (compactação)
+            elif len(child.children) == 1:
+                self._merge_with_child(parent, char, child)
+            
+            return True
+
+        # Caso 2: A chave é maior que o label, continuamos descendo
+        suffix = key[len(label):]
+        if self._remove_node(child, suffix):
+            # Na volta da recursão (backtracking), verificamos se o nó atual (child)
+            # precisa ser ajustado porque seu filho foi modificado/removido.
+            
+            # Se o child não é palavra e ficou sem filhos, removemos ele
+            if not child.is_leaf and not child.children:
+                del parent.children[char]
+            
+            # Se o child não é palavra e sobrou só 1 filho, fazemos merge
+            elif not child.is_leaf and len(child.children) == 1:
+                self._merge_with_child(parent, char, child)
+            
+            return True
+
+        return False
+
+    def _merge_with_child(self, parent, key_char, node):
+        """
+        Mescla 'node' com seu único filho para manter a propriedade compacta.
+        Parent -> Node -> Grandchild  ==vira==> Parent -> NewNode (Node+Grandchild)
+        """
+        # Pega o único filho (grandchild)
+        grandchild_key, grandchild = list(node.children.items())[0]
+        
+        # Concatena os labels: ex: "ro" + "ma" = "roma"
+        grandchild.label = node.label + grandchild.label
+        
+        # O pai passa a apontar direto para o neto (que agora tem o label fundido)
+        # Nota: A chave no dicionário do pai continua sendo a mesma (primeira letra)
+        parent.children[key_char] = grandchild
