@@ -24,6 +24,7 @@ data-structures-visualizer/
 ├── .gitignore
 ├── README.md                 # Documentação
 └── requirements.txt          # Dependências do projeto
+``` text
 
 
 ## 🚀 Funcionalidades Implementadas
