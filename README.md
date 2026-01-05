@@ -71,27 +71,32 @@ O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyte
 
 1. Clone o repositório:
    ```bash
-   git clone [https://github.com/seu-usuario/data-structures-visualizer.git](https://github.com/seu-usuario/data-structures-visualizer.git)
+   git clone [https://github.com/diegonhd/data-structures-visualizer.git]
    cd data-structures-visualizer
    ```
 2. Crie um ambiente virtual (venv):
     ```bash
     python -m venv venv
-    # Windows:
+    ```
+#### Windows:
+    ```bash
     venv\Scripts\activate
-
-    # Linux/Mac:
+    ```
+#### Linux/Mac
+    ```bash
     source venv/bin/activate
+    ```
 3. Instale as dependências:
     ```bash
     pip install -r requirements.txt
-
-### Como Usar
-## A melhor forma de visualizar as estruturas é através do Jupyter Notebook.
+    ```
+## Como Usar
+### A melhor forma de visualizar as estruturas é através do Jupyter Notebook.
 1. Inicie o Jupyter
     ```bash
     jupyter notebook
-2. Abra o arquivo ```text notebooks/demo_structures.ipynb
+    ```
+2. Abra o arquivo `notebooks/demo_structures.ipynb`
 
 ### 📊 Exemplos Visuais
 
