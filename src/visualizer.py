@@ -1,5 +1,7 @@
 import graphviz
+
 ROOT = "root"
+
 class TreeVisualizer:
     def visualize_binary_tree(self, tree):
         dot = graphviz.Digraph()
@@ -14,7 +16,7 @@ class TreeVisualizer:
 
             node_id = str(id(node))
             label = str(node.data)
-            
+
             if hasattr(node, 'height'):
                 label += f"\nh={node.height}"
 
@@ -41,7 +43,6 @@ class TreeVisualizer:
 
     def visualize_bplus_tree(self, tree):
         dot = graphviz.Digraph()
-        # Usamos 'plain' para que o formato seja definido puramente pelo HTML da label
         dot.attr('node', shape='plain')
         dot.attr(rankdir='TB')
 
@@ -52,48 +53,36 @@ class TreeVisualizer:
 
         def traverse(node):
             node_id = str(id(node))
-            
+
             if node.is_leaf:
-                # Construção de tabela HTML para folha
-                # bgcolor define a cor de fundo
                 label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#e1f5fe"><TR>'
                 for key in node.keys:
                     label += f'<TD>{key}</TD>'
                 label += '</TR></TABLE>>'
-                
+
                 leaves.append(node)
                 dot.node(node_id, label)
             else:
-                # Construção de tabela HTML para nó interno com PORTAS (c0, c1...)
                 label = '<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0"><TR>'
-                
-                # Intercala portas e chaves
-                # Formato visual: | * | key | * | key | * |
                 for i, key in enumerate(node.keys):
-                    label += f'<TD PORT="c{i}" BGCOLOR="#f0f0f0"> </TD>' # Ponteiro
-                    label += f'<TD>{key}</TD>'                         # Chave
-                
-                # Último ponteiro
+                    label += f'<TD PORT="c{i}" BGCOLOR="#f0f0f0"> </TD>'
+                    label += f'<TD>{key}</TD>'
                 label += f'<TD PORT="c{len(node.keys)}" BGCOLOR="#f0f0f0"> </TD>'
                 label += '</TR></TABLE>>'
-                
+
                 dot.node(node_id, label)
 
-                # Recursão para conectar filhos
                 for i, child in enumerate(node.children):
                     child_id = str(id(child))
-                    # Conecta da porta específica (c0, c1...) para o topo do nó filho
                     dot.edge(f"{node_id}:c{i}", child_id)
                     traverse(child)
 
         traverse(tree.root)
 
-        # Conectar folhas (lista encadeada)
         with dot.subgraph(name='leaves') as sub:
             sub.attr(rank='same')
             for i in range(len(leaves) - 1):
-                u, v = str(id(leaves[i])), str(id(leaves[i+1]))
-                # constraint=false evita que essa aresta afete a hierarquia da árvore
+                u, v = str(id(leaves[i])), str(id(leaves[i + 1]))
                 sub.edge(u, v, constraint='false', style='dashed', color='blue', arrowsize='0.5')
 
         return dot
@@ -108,53 +97,43 @@ class TreeVisualizer:
         def traverse(node, parent_id):
             for char, child_node in sorted(node.children.items()):
                 child_id = str(id(child_node))
-                
                 shape = 'doublecircle' if child_node.is_end_of_word else 'circle'
                 color = 'green' if child_node.is_end_of_word else 'black'
-
                 dot.node(child_id, "", shape=shape, color=color)
                 dot.edge(parent_id, child_id, label=char)
-
                 traverse(child_node, child_id)
 
         traverse(trie.root, root_id)
         return dot
 
-    def visualize_patricia(self, trie, output_name="patricia_trie"):
-            dot = graphviz.Digraph()
-            dot.attr(rankdir='TB')
+    def visualize_patricia(self, trie):
+        dot = graphviz.Digraph()
+        dot.attr(rankdir='TB')
 
-            # Agora 'trie' é realmente o objeto PatriciaTrie, pois 'self' absorveu o visualizador
-            root_id = str(id(trie.root)) 
-            dot.node(root_id, "root", shape='plaintext')
+        root_id = str(id(trie.root))
+        dot.node(root_id, "root", shape='plaintext')
 
-            def add_nodes_recursive(node, parent_id):
-                for char, child_node in sorted(node.children.items()):
-                    child_id = str(id(child_node))
-                    
-                    # Definição visual
-                    if child_node.is_leaf:
-                        shape = 'doublecircle'
-                        color = 'green'
-                        style = 'filled'
-                        fillcolor = '#eaffea'
-                    else:
-                        shape = 'circle'
-                        color = 'black'
-                        style = ''
-                        fillcolor = ''
+        def add_nodes_recursive(node, parent_id):
+            for char, child_node in sorted(node.children.items()):
+                child_id = str(id(child_node))
 
-                    dot.node(child_id, "", shape=shape, color=color, style=style, fillcolor=fillcolor)
-                    
-                    # Label da aresta = prefixo completo
-                    edge_label = child_node.label
-                    dot.edge(parent_id, child_id, label=edge_label)
+                if child_node.is_leaf:
+                    shape = 'doublecircle'
+                    color = 'green'
+                    style = 'filled'
+                    fillcolor = '#eaffea'
+                else:
+                    shape = 'circle'
+                    color = 'black'
+                    style = ''
+                    fillcolor = ''
 
-                    add_nodes_recursive(child_node, child_id)
+                dot.node(child_id, "", shape=shape, color=color, style=style, fillcolor=fillcolor)
+                dot.edge(parent_id, child_id, label=child_node.label)
+                add_nodes_recursive(child_node, child_id)
 
-            # Inicia a recursão
-            add_nodes_recursive(trie.root, root_id)    
-            return dot
+        add_nodes_recursive(trie.root, root_id)
+        return dot
 
     def visualize_hashtable(self, hashtable):
         dot = graphviz.Digraph()
@@ -172,15 +151,11 @@ class TreeVisualizer:
             curr = hashtable.table[i]
             if curr:
                 prev_id = f"buckets:f{i}"
-
                 while curr:
                     curr_id = str(id(curr))
-                    # Adiciona espaços para garantir que não pareça HTML tags
                     label = f"{{ {curr.key} | {curr.value} }}"
-
                     dot.node(curr_id, label)
                     dot.edge(prev_id, curr_id)
-
                     prev_id = curr_id
                     curr = curr.next
 
