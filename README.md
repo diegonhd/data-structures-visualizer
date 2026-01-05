@@ -1,10 +1,10 @@
-# Data Structures Visualizer 🌳📊
+# Data Structures Visualizer
 
-Este repositório contém implementações em Python de diversas estruturas de dados fundamentais, acompanhadas de uma ferramenta de visualização automatizada baseada em **Graphviz**.
+Este repositório contém implementações em Python de diversas estruturas de dados fundamentais, acompanhadas de uma ferramenta de visualização baseada em **Graphviz**.
 
-O objetivo deste projeto é fornecer uma forma visual e interativa de entender o comportamento interno de estruturas complexas como Árvores B+, AVL, Tries e Tabelas Hash, demonstrando operações de inserção, remoção, balanceamento e colisões.
+O objetivo deste projeto é fornecer uma forma visual e interativa de entender o comportamento interno de estruturas complexas como Árvore B+, AVL, Trie, Patricia e Tabela Hash, demonstrando operações de inserção, remoção, balanceamento e colisões.
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 data-structures-visualizer/
@@ -27,38 +27,38 @@ data-structures-visualizer/
 ```
 
 
-## 🚀 Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
 O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyter Notebook:
 
-### 1. Binary Search Tree (BST) 🌲
+### 1. Binary Search Tree (BST) 
 * Visualização da degeneração da árvore em uma lista encadeada (pior caso).
 * Inserção e remoção de nós.
 * Demonstração de formatos "zigue-zague".
 
-### 2. AVL Tree (Self-Balancing) ⚖️
+### 2. AVL Tree (Self-Balancing) 
 * **Rotação Simples:** Direita e Esquerda.
 * **Rotação Dupla:** Direita-Esquerda e Esquerda-Direita.
 * Rebalanceamento automático após inserções e remoções que alteram o fator de balanceamento (h).
 
-### 3. B+ Tree 💾
+### 3. B+ Tree 
 * Configuração de ordem da árvore (ex: M=3).
 * **Splits:** Divisão de páginas raiz e folhas.
 * **Cascade Split:** Divisão propagada para os pais.
 * **Merge:** Fusão de páginas após remoção de elementos para manter as propriedades da árvore.
 
-### 4. Tries & Patricia Tries 🔡
+### 4. Tries & Patricia Tries 
 * **Trie Padrão:** Inserção de palavras, visualização de prefixos comuns e remoção lógica (desmarcar flag de fim de palavra).
 * **Patricia Trie (Radix Tree):** Compressão de arestas para caminhos únicos, otimizando espaço.
 
-### 5. Hash Table 🗝️
+### 5. Hash Table 
 * Visualização de buckets e índices.
 * **Tratamento de Colisões:** Encadeamento externo (Linked List dentro do bucket).
 * Atualização de valores para chaves existentes.
 
 ---
 
-## 🛠️ Instalação e Requisitos
+##  Instalação e Requisitos
 
 ### Pré-requisitos
 * **Python 3.8+**
@@ -98,7 +98,7 @@ O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyte
     ```
 2. Abra o arquivo `notebooks/demo_structures.ipynb`
 
-### 📊 Exemplos Visuais
+### Exemplos Visuais
 
 O visualizador gera representações em SVG utilizando o Graphviz. Abaixo, exemplos do que é renderizado no notebook:
 
