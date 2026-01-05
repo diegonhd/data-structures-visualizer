@@ -4,6 +4,8 @@ Este repositório contém implementações em Python de diversas estruturas de d
 
 O objetivo deste projeto é fornecer uma forma visual e interativa de entender o comportamento interno de estruturas complexas como Árvore B+, AVL, Trie, Patricia e Tabela Hash, demonstrando operações de inserção, remoção, balanceamento e colisões.
 
+---
+
 ## Estrutura do Projeto
 
 ```text
@@ -26,6 +28,7 @@ data-structures-visualizer/
 └── requirements.txt          # Dependências do projeto
 ```
 
+---
 
 ## Funcionalidades Implementadas
 
@@ -78,18 +81,21 @@ O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyte
     ```bash
     python -m venv venv
     ```
-#### Windows:
-    ```bash
-    venv\Scripts\activate
-    ```
-#### Linux/Mac
-    ```bash
-    source venv/bin/activate
-    ```
+    * Windows:
+        ```bash
+        venv\Scripts\activate
+        ```
+    * Linux/Mac
+        ```bash
+        source venv/bin/activate
+        ```
 3. Instale as dependências:
     ```bash
     pip install -r requirements.txt
     ```
+
+---
+
 ## Como Usar
 ### A melhor forma de visualizar as estruturas é através do Jupyter Notebook.
 1. Inicie o Jupyter
@@ -98,11 +104,14 @@ O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyte
     ```
 2. Abra o arquivo `notebooks/demo_structures.ipynb`
 
-### Exemplos Visuais
+---
+
+## Exemplos Visuais
 
 O visualizador gera representações em SVG utilizando o Graphviz. Abaixo, exemplos do que é renderizado no notebook:
 
-* **BST:** Nós com seus valores e alturas.
-* **AVL:** Setas indicando rotações (L/R) e fatores de balanceamento.
-* **B+ Tree:** Páginas agrupadas em clusters visuais para diferenciar nós internos e folhas.
-* **Hash Table:** Tabela vertical representando os índices (buckets) e nós laterais representando os valores armazenados.
+* **BST:** Nós com seus valores e alturas exibidos.
+* **AVL:** Setas coloridas indicando a direção das rotações (L/R) e nós com fatores de balanceamento.
+* **B+ Tree:** Páginas agrupadas em clusters visuais para diferenciar claramente nós internos de nós folhas.
+* **Tries & Patricia Tries:** Arestas rotuladas com caracteres (Trie) ou prefixos comprimidos (Patricia). Nós que marcam o fim de uma palavra são destacados visualmente (cor verde ou círculo duplo).
+* **Hash Table:** Tabela vertical representando os índices (buckets) à esquerda e nós laterais representando os valores armazenados (tratamento de colisão).
