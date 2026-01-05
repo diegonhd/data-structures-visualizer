@@ -24,7 +24,7 @@ data-structures-visualizer/
 ├── .gitignore
 ├── README.md                 # Documentação
 └── requirements.txt          # Dependências do projeto
-``` text
+```
 
 
 ## 🚀 Funcionalidades Implementadas
@@ -73,6 +73,7 @@ O projeto cobre as seguintes estruturas e comportamentos, demonstrados no Jupyte
    ```bash
    git clone [https://github.com/seu-usuario/data-structures-visualizer.git](https://github.com/seu-usuario/data-structures-visualizer.git)
    cd data-structures-visualizer
+   ```
 2. Crie um ambiente virtual (venv):
     ```bash
     python -m venv venv
